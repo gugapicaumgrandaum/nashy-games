@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Forca</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f8f8f8;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+        }
+
+        h1 {
+            color: #e50914;
+            margin-bottom: 20px;
+        }
+
+        .word {
+            font-size: 2em;
+            letter-spacing: 0.5em;
+            margin: 20px 0;
+        }
+
+        .message {
+            margin: 20px 0;
+            font-size: 1.2em;
+            color: #e50914;
+        }
+
+        .input-container {
+            margin: 20px 0;
+            background: linear-gradient(to right, #000, #e50914); /* Gradiente preto para vermelho */
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 50px;
+            text-align: center;
+            color: #fff; /* Texto branco */
+            background-color: #333; /* Fundo escuro para o input */
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #e50914;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-left: 10px;
+        }
+
+        button:hover {
+            background-color: #f40612;
+        }
+
+        .hangman-container {
+            margin-top: 20px;
+            background-color: #e50914; /* Fundo vermelho */
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 2em;
+            color: #fff; /* Texto branco */
+        }
+
+        .attempts {
+            font-size: 1.2em;
+            margin-top: 10px;
+            text-transform: uppercase; /* Letras maiúsculas */
+            font-family: 'Courier New', Courier, monospace; /* Fonte bonita */
+        }
+
+        #restartButton {
+            margin-top: 40px; /* Move o botão para mais baixo */
+            background-color: #000; /* Fundo preto */
+            color: #fff; /* Texto branco */
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo da Forca</h1>
+    <div class="word" id="wordDisplay"></div>
+    <div class="message" id="message"></div>
+    <div class="input-container">
+        <input type="text" id="letterInput" maxlength="1" placeholder="A">
+        <button id="guessButton">Adivinhar</button>
+    </div>
+    <div class="hangman-container" id="hangmanDisplay">
+        <div id="hangman"></div>
+        <div class="attempts" id="attemptsDisplay">Tentativas Restantes: 6</div>
+    </div>
+    <button id="restartButton" style="display: none;">Recomeçar</button>
+
+    <script>
+        const words = ["javascript", "programacao", "desenvolvimento", "computador", "internet"];
+        let selectedWord = "";
+        let guessedLetters = [];
+        let wrongGuesses = 0;
+        const maxWrongGuesses = 6;
+
+        const wordDisplay = document.getElementById("wordDisplay");
+        const messageDisplay = document.getElementById("message");
+        const letterInput = document.getElementById("letterInput");
+        const guessButton = document.getElementById("guessButton");
+        const hangmanDisplay = document.getElementById("hangmanDisplay");
+        const hangmanElement = document.getElementById("hangman");
+        const attemptsDisplay = document.getElementById("attemptsDisplay");
+        const restartButton = document.getElementById("restartButton");
+
+        function startGame() {
+            selectedWord = words[Math.floor(Math.random() * words.length)];
+            guessedLetters = [];
+            wrongGuesses = 0;
+            wordDisplay.textContent = "_ ".repeat(selectedWord.length);
+            messageDisplay.textContent = "";
+            hangmanElement.textContent = ""; // Limpa o bonequinho
+            attemptsDisplay.textContent = `Tentativas Restantes: ${maxWrongGuesses}`; // Reseta tentativas
+            letterInput.value = "";
+            guessButton.disabled = false; // Habilita o botão de adivinhação
+            restartButton.style.display = "none"; // Esconde o botão de recomeçar
+        }
+
+        function updateDisplay() {
+            const displayWord = selectedWord.split("").map(letter => (guessedLetters.includes(letter) ? letter : "_")).join(" ");
+            wordDisplay.textContent = displayWord;
+
+            if (displayWord.replace(/ /g, "") === selectedWord) {
+                messageDisplay.textContent = "Você venceu!";
+                guessButton.disabled = true; // Desabilita o botão de adivinhação
+                restartButton.style.display = "block"; // Mostra o botão de recomeçar
+            } else if (wrongGuesses >= maxWrongGuesses) {
+                messageDisplay.textContent = `Você perdeu! A palavra era "${selectedWord}".`;
+                guessButton.disabled = true; // Desabilita o botão de adivinhação
+                restartButton.style.display = "block"; // Mostra o botão de recomeçar
+            }
+        }
+
+        guessButton.addEventListener("click", () => {
+            const letter = letterInput.value.toLowerCase();
+            letterInput.value = "";
+
+            if (letter && !guessedLetters.includes(letter)) {
+                guessedLetters.push(letter);
+                if (!selectedWord.includes(letter)) {
+                    wrongGuesses++;
+                    hangmanElement.textContent = getHangmanDrawing(wrongGuesses); // Atualiza o bonequinho
+                    attemptsDisplay.textContent = `Tentativas Restantes: ${maxWrongGuesses - wrongGuesses}`; // Atualiza tentativas
+                }
+                updateDisplay();
+            }
+        });
+
+        function getHangmanDrawing(wrongGuesses) {
+            const drawings = [
+                "", // 0 tentativas erradas
+                "😞", // 1 tentativa errada
+                "😟", // 2 tentativas erradas
+                "😕", // 3 tentativas erradas
+                "😬", // 4 tentativas erradas
+                "😨", // 5 tentativas erradas
+                "😱"  // 6 tentativas erradas
+            ];
+            return drawings[wrongGuesses];
+        }
+
+        restartButton.addEventListener("click", startGame);
+
+        // Inicia o jogo ao carregar a página
+        startGame();
+    </script>
+</body>
+</html>

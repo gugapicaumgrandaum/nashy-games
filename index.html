@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Netflix</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #141414;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 60px;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-form h1 {
+            margin-bottom: 28px;
+            font-size: 32px;
+            font-weight: 500;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 10px 10px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #333;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            color: #8c8c8c;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus ~ label,
+        .input-group input:valid ~ label {
+            top: -10px;
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background-color: #e50914;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #f40612;
+        }
+
+        .help-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .help-links a {
+            color: #b3b3b3;
+            text-decoration: none;
+        }
+
+        .help-links a:hover {
+            text-decoration: underline;
+        }
+
+        .signup-link {
+            margin-top: 40px;
+            color: #737373;
+            font-size: 16px;
+        }
+
+        .signup-link a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <form class="login-form" id="loginForm">
+            <h1>Entrar</h1>
+            <div class="input-group">
+                <input type="email" id="email" name="email" required>
+                <label for="email">Email ou número de telefone</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" name="password" required>
+                <label for="password">Senha</label>
+            </div>
+            <button type="submit">Entrar</button>
+            <div class="help-links">
+                <label>
+                    <input type="checkbox" name="remember"> Lembre-se de mim
+                </label>
+                <a href="#">Precisa de ajuda?</a>
+            </div>
+            <div class="signup-link">
+                <p>Novo por aqui? <a href="cadastro.html">Assine agora</a>.</p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Envia os dados para o servidor
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao fazer login');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message); // Exibe uma mensagem de sucesso
+                window.location.href = 'dashboard.html'; // Redireciona para a página de dashboard
+            })
+            .catch(error => {
+                alert(error.message); // Exibe uma mensagem de erro
+            });
+        });
+    </script>
+</body>
+</html>

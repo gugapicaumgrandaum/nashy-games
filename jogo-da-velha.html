@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f8f8;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            border: 2px solid #e50914;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .cell:hover {
+            background-color: #ffe6e6;
+            transform: scale(1.05);
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #e50914;
+        }
+
+        h1 {
+            color: #e50914;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .restart-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #e50914;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: none; /* Inicialmente escondido */
+            transition: background-color 0.3s;
+        }
+
+        .restart-button:hover {
+            background-color: #f40612;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jogo da Velha</h1>
+        <div class="score">
+            <strong>Jogador (X):</strong> <span id="playerScore">0</span> | 
+            <strong>Máquina (O):</strong> <span id="computerScore">0</span>
+        </div>
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <div class="message" id="message"></div>
+        <button class="restart-button" id="restartButton">Recomeçar</button>
+    </div>
+
+    <script>
+        const boardElement = document.getElementById('board');
+        const messageElement = document.getElementById('message');
+        const restartButton = document.getElementById('restartButton');
+        const playerScoreElement = document.getElementById('playerScore');
+        const computerScoreElement = document.getElementById('computerScore');
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let playerScore = 0;
+        let computerScore = 0;
+
+        const winningCombinations = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        boardElement.addEventListener('click', (event) => {
+            const index = event.target.dataset.index;
+            if (board[index] === '' && !checkWinner()) {
+                board[index] = currentPlayer;
+                event.target.textContent = currentPlayer;
+                if (checkWinner()) {
+                    messageElement.textContent = `${currentPlayer} venceu!`;
+                    if (currentPlayer === 'X') {
+                        playerScore++;
+                        playerScoreElement.textContent = playerScore;
+                    } else {
+                        computerScore++;
+                        computerScoreElement.textContent = computerScore;
+                    }
+                    restartButton.style.display = 'block'; // Mostra o botão de recomeçar
+                } else if (board.every(cell => cell !== '')) {
+                    messageElement.textContent = 'Empate!';
+                    restartButton.style.display = 'block'; // Mostra o botão de recomeçar
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    if (currentPlayer === 'O') {
+                        makeComputerMove();
+                    }
+                }
+            }
+        });
+
+        function checkWinner() {
+            return winningCombinations.some(combination => {
+                return combination.every(index => board[index] === currentPlayer);
+            });
+        }
+
+        function makeComputerMove() {
+            let move = findBestMove('O');
+            if (move === null) {
+                move = findBestMove('X');
+            }
+            if (move === null) {
+                let availableMoves = board.map((cell, index) => cell === '' ? index : null).filter(index => index !== null);
+                move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+            }
+            board[move] = currentPlayer;
+            document.querySelector(`.cell[data-index='${move}']`).textContent = currentPlayer;
+            if (checkWinner()) {
+                messageElement.textContent = `${currentPlayer} venceu!`;
+                if (currentPlayer === 'X') {
+                    playerScore++;
+                    playerScoreElement.textContent = playerScore;
+                } else {
+                    computerScore++;
+                    computerScoreElement.textContent = computerScore;
+                }
+                restartButton.style.display = 'block'; // Mostra o botão de recomeçar
+            } else if (board.every(cell => cell !== '')) {
+                messageElement.textContent = 'Empate!';
+                restartButton.style.display = 'block'; // Mostra o botão de recomeçar
+            } else {
+                currentPlayer = 'X';
+            }
+        }
+
+        function findBestMove(player) {
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (board[a] === player && board[b] === player && board[c] === '') return c;
+                if (board[a] === player && board[c] === player && board[b] === '') return b;
+                if (board[b] === player && board[c] === player && board[a] === '') return a;
+            }
+            return null;
+        }
+
+        // Função para reiniciar o jogo
+        restartButton.addEventListener('click', () => {
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            messageElement.textContent = '';
+            restartButton.style.display = 'none'; // Esconde o botão de recomeçar
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.textContent = '';
+            });
+        });
+    </script>
+</body>
+</html>

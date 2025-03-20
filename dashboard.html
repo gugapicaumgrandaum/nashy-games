@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Jogos</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #141414;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .play-button {
+            padding: 10px 20px;
+            background-color: #e50914;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            margin: 10px; /* Espaçamento entre os botões */
+        }
+
+        .play-button:hover {
+            background-color: #f40612;
+        }
+
+        .play-button span {
+            margin-left: 10px; /* Espaço entre o emoji e o texto */
+        }
+    </style>
+</head>
+<body>
+    <h1>Bem-vindo ao Menu de Jogos!</h1>
+    
+    <button class="play-button" onclick="window.location.href='jogo-da-velha.html'">
+        🎮 <span>Jogar Jogo da Velha</span>
+    </button>
+
+    <button class="play-button" onclick="window.location.href='jogo-da-forca.html'">
+        ⚔️ <span>Jogar Jogo da Forca</span>
+    </button>
+</body>
+</html>
